@@ -1,0 +1,11 @@
+name: StrengthPlus
+version: 1.0
+main: top.raven.strengthplus.StrengthPlus
+api-version: 1.16
+commands:
+  sp:
+    description: "strengthPlus command"
+    usage: /sp
+    aliases: [ stregnthplus,qh ]
+    permission: "strengths.use"
+    permission-message: "§a[StrengthPlus]§c无权使用"
