@@ -103,7 +103,7 @@ public class StregnthStrackHandler {
                         if(level>7 && !isSafe){
                             Bukkit.broadcastMessage("§a§l[强化公告]:§c§l玩家§b§l"+player.getName()+"§c§l将他的武器强化到" +
                                     "§c§l[§e§l"+(level+1)+"§c§l]§c§l级时强化炉发生了爆炸！导致武器被炸毁了");
-                            mainHandStack.setType(Material.AIR);
+                            player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
                         }else if(level> 7 && isSafe) {
                             Bukkit.broadcastMessage("§a§l[强化公告]:§c§l玩家§a§l"+player.getName()+"§c§l将他的武器强化到" +
                                     "§c§l[§e§l"+(level+1)+"§c§l]§c§l级时强化炉发生了爆炸！但是由于装备保护卷的保护导致武器并没有炸毁！");
@@ -190,9 +190,12 @@ public class StregnthStrackHandler {
 
     private boolean isStrengthStone(ItemStack stack,Material material){
         if(stack.getType() == material && stack.getItemMeta().hasLore()){
-            String info = stack.getItemMeta().getLore().get(0);
-            if(info.equals(NORMAL_LORE) || info.equals(SAFE_LORE)){
-                return true;
+            String itemName = stack.getItemMeta().getDisplayName();
+            if(itemName.equals(STRENGTH_SAFE) || itemName.equals(STRENGTH_NORMAL)){
+                String info = stack.getItemMeta().getLore().get(0);
+                if(info.equals(NORMAL_LORE) || info.equals(SAFE_LORE)){
+                    return true;
+                }
             }
         }
         return false;
@@ -223,9 +226,15 @@ public class StregnthStrackHandler {
         this.player = player;
         this.inventory = player.getInventory();
     }
+
     List<String> lore;
+    ItemMeta strengthMeta;
+    ItemStack strengthItem;
     public void giveNormalStone(Player player,Material material,int amount){
-        ItemStack strengthItem = new ItemStack(material);
+        strengthItem = new ItemStack(material);
+        strengthMeta = strengthItem.getItemMeta();
+        strengthMeta.setDisplayName(STRENGTH_NORMAL);
+        strengthItem.setItemMeta(strengthMeta);
         lore = new ArrayList<>();
         lore.add(NORMAL_LORE);
         strengthItem.setLore(lore);
@@ -248,8 +257,10 @@ public class StregnthStrackHandler {
     }
 
     public void giveSafeStone(Player player,Material material,int amount){
-        ItemStack strengthItem = new ItemStack(material);
-        strengthItem.getItemMeta().setLocalizedName(STRENGTH_SAFE);
+        strengthItem = new ItemStack(material);
+        strengthMeta = strengthItem.getItemMeta();
+        strengthMeta.setDisplayName(STRENGTH_SAFE);
+        strengthItem.setItemMeta(strengthMeta);
         lore = new ArrayList<>();
         lore.add(SAFE_LORE);
         strengthItem.setLore(lore);
