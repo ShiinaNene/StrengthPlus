@@ -69,17 +69,24 @@ public class OnDamageListener implements Listener {
         if(!(attackEvent.getDamager() instanceof Player)){
             if(attackEvent.getDamage()<=defenceDamage && !isPlayerShoter){
                 onDamage(attackEvent,MONISTOR,defenceDamage);
-                isPlayerShoter = false;
             }
         }
+        isPlayerShoter = false;
+        damager = null;
     }
 
     private void onDamage(EntityDamageByEntityEvent attackEvent,int itemValue,double armorDamage){
         double essentialsDamage = attackEvent.getDamage();
         double damage = Math.round(onDamageEvent(damager,itemValue) + essentialsDamage);
         //debug 用的数据测试
-        /*damager.sendMessage("§a[strengthPlus]"+"基础伤害："+((int)essentialsDamage)+" 强化伤害："+damage+" 最终伤害："+(damage-armorDamage));*/
+        /*if(damager instanceof Player){
+            damager.sendMessage("§a[strengthPlus]"+"基础伤害："+((int)essentialsDamage)+" 强化伤害："+damage+" 最终伤害："+(damage-armorDamage)
+                    );
+        }*/
         if(damage<=armorDamage){
+            /*if(damager instanceof Player){
+                damager.sendMessage("§a[strengthPlus]"+"由于防御过高触发最小damage事件，最小伤害为："+minDamage);
+            }*/
             attackEvent.setDamage(minDamage);
         }else {
             attackEvent.setDamage(damage-armorDamage);
