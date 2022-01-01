@@ -7,6 +7,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import top.raven.strengthplus.item.StrengthItemMeta;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -24,42 +25,43 @@ public class StregnthStrackHandler {
     private static Material STRENGTH_STONE = Material.SPONGE;
     private String STRENGTH_NORMAL = "§b强化石", STRENGTH_SAFE = "§c保护强化卷";
     private final Material STRENGTH_PAPER = Material.PAPER;
-    private String NORMAL_LORE = "§a用于强化武器和防具的好东西",SAFE_LORE= "§e保护强化卷，用于在超过8级之后的强化保护武器不被破坏";
+    private String NORMAL_LORE = "§a用于强化武器和防具的好东西", SAFE_LORE = "§e保护强化卷，用于在超过8级之后的强化保护武器不被破坏";
     private Inventory inventory;
     private List<Material> canStrengthItem;
     private Player player;
     private Random random = new Random();
 
-    public StregnthStrackHandler(){
+    public StregnthStrackHandler() {
 
     }
 
-    public StregnthStrackHandler(Player player){
+    public StregnthStrackHandler(Player player) {
         this.player = player;
         this.inventory = player.getInventory();
     }
 
-    private int[] chanceArray = {100,90,80,70,60,50,40,20,10,5};
+    private int[] chanceArray = {100, 90, 80, 70, 60, 50, 40, 20, 10, 5};
     private final String AdminLore = "§c✡✡✡✡✡✡✡✡✡✡";
-    public void strengthItem(boolean isSafe,boolean isAdmin){
+
+    public void strengthItem(boolean isSafe, boolean isAdmin) {
         ItemStack[] stacks = inventory.getContents();
         ItemStack mainHandStack = player.getInventory().getItemInMainHand();
-        if(getLevel(mainHandStack.getItemMeta())==10) {
+        if (getLevel(mainHandStack.getItemMeta()) == 10) {
             player.sendMessage("§a§l[StrengthPlus]§c§l你的武器已强化到最高等级！无法再进行武器的强化！");
-        }else {
-            if(!isSafe && !isAdmin){
-                if(getStrengthStoneCount(stacks,NORMAL_LORE,STRENGTH_STONE)>0 ){
+        } else {
+            if (!isSafe && !isAdmin) {
+                if (getStrengthStoneCount(stacks, NORMAL_LORE, STRENGTH_STONE) > 0) {
                     onItemStrenght(mainHandStack, false);
-                }else {
+                } else {
                     player.sendMessage("§a[StrengthPlus]§c请确定您有足够的强化石以供强化！");
                 }
-            }else if(isSafe){
-                if(getStrengthStoneCount(stacks,SAFE_LORE,STRENGTH_PAPER)>0) {
+            } else if (isSafe) {
+                if (getStrengthStoneCount(stacks, SAFE_LORE, STRENGTH_PAPER) > 0) {
                     onItemStrenght(mainHandStack, true);
-                }else {
+                } else {
                     player.sendMessage("§a[StrengthPlus]§c请确定您有足够的强化石以供强化！");
                 }
-            }else if(isAdmin && mainHandStack.getType() != Material.AIR){
+            } else if (isAdmin && mainHandStack.getType() != Material.AIR) {
                 //管理员强化，什么都能强化，不需要检测
                 List<String> levelList = new ArrayList<>();
                 levelList.add(ADMIN_PREFIX);
@@ -67,68 +69,68 @@ public class StregnthStrackHandler {
                 ItemMeta adminMeta = mainHandStack.getItemMeta();
                 adminMeta.setLore(levelList);
                 mainHandStack.setItemMeta(adminMeta);
-                Bukkit.broadcastMessage("§a§l[公告]:§c§l卑鄙的管理员§6§l"+player.getName()+"§c§l使用作弊指令将他的武器强化到了"+
-                        "§c§l[§e§l"+(10)+"§c§l]§6§l级！§c§l真是厚颜无耻！");
-            }else {
+                Bukkit.broadcastMessage("§a§l[公告]:§c§l卑鄙的管理员§6§l" + player.getName() + "§c§l使用作弊指令将他的武器强化到了" +
+                        "§c§l[§e§l" + (10) + "§c§l]§6§l级！§c§l真是厚颜无耻！");
+            } else {
                 player.sendMessage("§a[StrengthPlus]§c请确定您有足够的强化石以供强化！");
             }
         }
     }
 
-    private boolean onItemStrenght(ItemStack mainHandStack,boolean isSafe){
-        if(mainHandStack != null && mainHandStack.getType() != Material.AIR){
-            if(canBeStrength(mainHandStack,canStrengthItem)){
+    private boolean onItemStrenght(ItemStack mainHandStack, boolean isSafe) {
+        if (mainHandStack != null && mainHandStack.getType() != Material.AIR) {
+            if (canBeStrength(mainHandStack, canStrengthItem)) {
                 ItemMeta meta = mainHandStack.getItemMeta();
                 int level = getLevel(meta);
-                if(level==10){
+                if (level == 10) {
                     player.sendMessage("§a§l[StrengthPlus]§c§l你的武器已强化到最高等级！无法再进行武器的强化！");
-                }else {
+                } else {
                     int chance = random.nextInt(101);
                     /*if(player.hasPermission("strength.admin")){//当管理员强化时能看到几率，用于调试用
                         player.sendMessage("§achance: §b"+chance+"§a level:§b"+getLevel(meta));
                         player.sendMessage("§aLevelChance: §b"+chanceArray[getLevel(meta)]);
                     }*/
-                    if(chance < chanceArray[level]){
-                        player.sendMessage("§a[StrengthPlus]§6恭喜你，强化成功！ §b当前武器等级为 [§a"+(level+1)+"§b]");
-                        if(level>=5 && level<9){
-                            Bukkit.broadcastMessage("§a§l[强化公告]:§b§l恭喜玩家§6§l"+player.getName()+"§b§l将他的武器强化到了"+
-                                    "§c§l[§e§l"+(level+1)+"§c§l]§6§l级！");
-                        }else if(level==9){
-                            Bukkit.broadcastMessage("§a§l[强化公告]:§b§l只见强化炉中一抹金光闪烁！恭喜玩家§6§l"+player.getName()+"§b§l将他的武器强化到了"+
-                                    "§c§l[§e§l"+(level+1)+"§c§l]§6§l级，真是可喜可贺！");
+                    if (chance < chanceArray[level]) {
+                        player.sendMessage("§a[StrengthPlus]§6恭喜你，强化成功！ §b当前武器等级为 [§a" + (level + 1) + "§b]");
+                        if (level >= 5 && level < 9) {
+                            Bukkit.broadcastMessage("§a§l[强化公告]:§b§l恭喜玩家§6§l" + player.getName() + "§b§l将他的武器强化到了" +
+                                    "§c§l[§e§l" + (level + 1) + "§c§l]§6§l级！");
+                        } else if (level == 9) {
+                            Bukkit.broadcastMessage("§a§l[强化公告]:§b§l只见强化炉中一抹金光闪烁！恭喜玩家§6§l" + player.getName() + "§b§l将他的武器强化到了" +
+                                    "§c§l[§e§l" + (level + 1) + "§c§l]§6§l级，真是可喜可贺！");
                         }
-                        mainHandStack.setItemMeta(setLevel(meta,true));
-                    }else {
+                        mainHandStack.setItemMeta(setLevel(meta, true));
+                    } else {
                         player.sendMessage("§a[StrengthPlus]§c很遗憾，你的强化失败了！");
-                        if(level>7 && !isSafe){
-                            Bukkit.broadcastMessage("§a§l[强化公告]:§c§l玩家§b§l"+player.getName()+"§c§l将他的武器强化到" +
-                                    "§c§l[§e§l"+(level+1)+"§c§l]§c§l级时强化炉发生了爆炸！导致武器被炸毁了");
+                        if (level > 7 && !isSafe) {
+                            Bukkit.broadcastMessage("§a§l[强化公告]:§c§l玩家§b§l" + player.getName() + "§c§l将他的武器强化到" +
+                                    "§c§l[§e§l" + (level + 1) + "§c§l]§c§l级时强化炉发生了爆炸！导致武器被炸毁了");
                             player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
-                        }else if(level> 7 && isSafe) {
-                            Bukkit.broadcastMessage("§a§l[强化公告]:§c§l玩家§a§l"+player.getName()+"§c§l将他的武器强化到" +
-                                    "§c§l[§e§l"+(level+1)+"§c§l]§c§l级时强化炉发生了爆炸！但是由于装备保护卷的保护导致武器并没有炸毁！");
+                        } else if (level > 7 && isSafe) {
+                            Bukkit.broadcastMessage("§a§l[强化公告]:§c§l玩家§a§l" + player.getName() + "§c§l将他的武器强化到" +
+                                    "§c§l[§e§l" + (level + 1) + "§c§l]§c§l级时强化炉发生了爆炸！但是由于装备保护卷的保护导致武器并没有炸毁！");
 
                         }
-                        mainHandStack.setItemMeta(setLevel(meta,false));
+                        mainHandStack.setItemMeta(setLevel(meta, false));
                         return false;
                     }
                 }
-            }else {
+            } else {
                 player.sendMessage("§a[StrengthPlus]§c请查看您的主手是否为可强化武器或不为空！");
             }
-        }else {
+        } else {
             player.sendMessage("§a[StrengthPlus]§c请查看您的主手是否为可强化武器或不为空！");
         }
-       return true;
+        return true;
     }
 
-    private int getLevel(ItemMeta meta){
+    private int getLevel(ItemMeta meta) {
         int level = 0;
-        if(meta!=null){
-            if(meta.hasLore()){
-                if(meta.getLore().get(0).equals(STRENGTH_PREFIX) || meta.getLore().get(0).equals(ADMIN_PREFIX)){
-                    level = meta.getLore().get(1).length()-2;//获取第一行的lore
-                }else{
+        if (meta != null) {
+            if (meta.hasLore()) {
+                if (meta.getLore().get(0).equals(STRENGTH_PREFIX) || meta.getLore().get(0).equals(ADMIN_PREFIX)) {
+                    level = meta.getLore().get(1).length() - 2;//获取第一行的lore
+                } else {
                     level = 0;
                 }
             }
@@ -136,47 +138,48 @@ public class StregnthStrackHandler {
         return level;
     }
 
-    private ItemMeta setLevel(ItemMeta meta,boolean isSuccess){
+    private ItemMeta setLevel(ItemMeta meta, boolean isSuccess) {
         int level = getLevel(meta);
         List<String> levelList = new ArrayList<>();
         levelList.add(STRENGTH_PREFIX);
         StringBuffer buffer = new StringBuffer();
-        if(level>0){
-            if(isSuccess){
+        if (level > 0) {
+            if (isSuccess) {
                 level++;
-            }else {
+            } else {
                 level--;
             }
             //超过8级时强化颜色变成金色
-            if(level>7) {
+            if (level > 7) {
                 buffer.append("§e");
-            }else {
+            } else {
                 buffer.append("§b");
             }
-            for(int i=0;i<level;i++){
+            for (int i = 0; i < level; i++) {
                 buffer.append("✡");
             }
             levelList.add(buffer.toString());
-        }else {
-            if(isSuccess){
+        } else {
+            if (isSuccess) {
                 levelList.add("§b✡");
-            }else {
+            } else {
                 return meta;
             }
         }
         meta.setLore(levelList);
         return meta;
     }
-    private int getStrengthStoneCount(ItemStack[] stacks,String lore,Material material){
+
+    private int getStrengthStoneCount(ItemStack[] stacks, String lore, Material material) {
         int count = 0;
         boolean haveSub = false;
-        for (ItemStack stack : stacks){
-            if(stack != null){
-                if(isStrengthStone(stack,material)) {
-                    if(stack.getItemMeta().hasLore()){
-                        if(stack.getItemMeta().getLore().get(0).equals(lore)){
+        for (ItemStack stack : stacks) {
+            if (stack != null) {
+                if (isStrengthStone(stack, material)) {
+                    if (stack.getItemMeta().hasLore()) {
+                        if (stack.getItemMeta().getLore().get(0).equals(lore)) {
                             count += stack.getAmount();
-                            if(!haveSub) {
+                            if (!haveSub) {
                                 stack.setAmount(stack.getAmount() - 1);
                                 haveSub = true;
                             }
@@ -188,12 +191,12 @@ public class StregnthStrackHandler {
         return count;
     }
 
-    private boolean isStrengthStone(ItemStack stack,Material material){
-        if(stack.getType() == material && stack.getItemMeta().hasLore()){
+    private boolean isStrengthStone(ItemStack stack, Material material) {
+        if (stack.getType() == material && stack.getItemMeta().hasLore()) {
             String itemName = stack.getItemMeta().getDisplayName();
-            if(itemName.equals(STRENGTH_SAFE) || itemName.equals(STRENGTH_NORMAL)){
+            if (itemName.equals(STRENGTH_SAFE) || itemName.equals(STRENGTH_NORMAL)) {
                 String info = stack.getItemMeta().getLore().get(0);
-                if(info.equals(NORMAL_LORE) || info.equals(SAFE_LORE)){
+                if (info.equals(NORMAL_LORE) || info.equals(SAFE_LORE)) {
                     return true;
                 }
             }
@@ -201,10 +204,10 @@ public class StregnthStrackHandler {
         return false;
     }
 
-    private boolean canBeStrength(ItemStack stack,List<Material> itemMetas){
+    private boolean canBeStrength(ItemStack stack, List<Material> itemMetas) {
         Material material = stack.getType();
-        for(Object mate : itemMetas){
-            if(mate.toString().equals(material.toString())){
+        for (Object mate : itemMetas) {
+            if (mate.toString().equals(material.toString())) {
                 return true;
             }
         }
@@ -212,10 +215,10 @@ public class StregnthStrackHandler {
     }
 
     @Deprecated
-    private boolean canBeStrength(ItemStack stack){
+    private boolean canBeStrength(ItemStack stack) {
         Material material = stack.getType();
-        for(int i = 0; i < StrengthItemMeta.DEFAULT_META.length; i++){
-            if(material == StrengthItemMeta.DEFAULT_META[i]){
+        for (int i = 0; i < StrengthItemMeta.DEFAULT_META.length; i++) {
+            if (material == StrengthItemMeta.DEFAULT_META[i]) {
                 return true;
             }
         }
@@ -230,52 +233,57 @@ public class StregnthStrackHandler {
     List<String> lore;
     ItemMeta strengthMeta;
     ItemStack strengthItem;
-    public void giveNormalStone(Player player,Material material,int amount){
+
+    public void giveNormalStone(Player player, Material material, int amount) {
         strengthItem = new ItemStack(material);
         strengthMeta = strengthItem.getItemMeta();
         strengthMeta.setDisplayName(STRENGTH_NORMAL);
         strengthItem.setItemMeta(strengthMeta);
         lore = new ArrayList<>();
         lore.add(NORMAL_LORE);
-        strengthItem.setLore(lore);
-        while (true){
-            if(inventory.firstEmpty()<0 || inventory.firstEmpty()>35){
+        ItemMeta meta = strengthItem.getItemMeta();
+        meta.setLore(lore);
+        strengthItem.setItemMeta(meta);
+        while (true) {
+            if (inventory.firstEmpty() < 0 || inventory.firstEmpty() > 35) {
                 player.sendMessage("§a[StrengthPlus]请确定你的背包有空位置！");
                 return;
-            }else {
-                if(amount>64){
+            } else {
+                if (amount > 64) {
                     strengthItem.setAmount(64);
-                    player.getInventory().setItem(inventory.firstEmpty(),strengthItem);
-                    amount-=64;
-                }else {
+                    player.getInventory().setItem(inventory.firstEmpty(), strengthItem);
+                    amount -= 64;
+                } else {
                     strengthItem.setAmount(amount);
-                    player.getInventory().setItem(inventory.firstEmpty(),strengthItem);
+                    player.getInventory().setItem(inventory.firstEmpty(), strengthItem);
                     return;
                 }
             }
         }
     }
 
-    public void giveSafeStone(Player player,Material material,int amount){
+    public void giveSafeStone(Player player, Material material, int amount) {
         strengthItem = new ItemStack(material);
         strengthMeta = strengthItem.getItemMeta();
         strengthMeta.setDisplayName(STRENGTH_SAFE);
         strengthItem.setItemMeta(strengthMeta);
         lore = new ArrayList<>();
         lore.add(SAFE_LORE);
-        strengthItem.setLore(lore);
-        while (true){
-            if(inventory.firstEmpty()<0 || inventory.firstEmpty()>35){
+        ItemMeta meta = strengthItem.getItemMeta();
+        meta.setLore(lore);
+        strengthItem.setItemMeta(meta);
+        while (true) {
+            if (inventory.firstEmpty() < 0 || inventory.firstEmpty() > 35) {
                 player.sendMessage("§a[StrengthPlus]请确定你的背包有空位置！");
                 return;
-            }else {
-                if(amount>64){
+            } else {
+                if (amount > 64) {
                     strengthItem.setAmount(64);
-                    player.getInventory().setItem(inventory.firstEmpty(),strengthItem);
-                    amount-=64;
-                }else {
+                    player.getInventory().setItem(inventory.firstEmpty(), strengthItem);
+                    amount -= 64;
+                } else {
                     strengthItem.setAmount(amount);
-                    player.getInventory().setItem(inventory.firstEmpty(),strengthItem);
+                    player.getInventory().setItem(inventory.firstEmpty(), strengthItem);
                     return;
                 }
             }

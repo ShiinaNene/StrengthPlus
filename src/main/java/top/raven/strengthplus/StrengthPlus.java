@@ -25,28 +25,31 @@ import java.util.stream.Collectors;
  * @Date: 2021/5/16
  * @Version: 1.0
  */
-public class StrengthPlus extends JavaPlugin{
+public class StrengthPlus extends JavaPlugin {
     private final String DEFAULT_COMMAND = "sp";
+
     @Override
     public void onLoad() {
-        getServer().getConsoleSender().sendMessage(Color.GREEN+"[StrengthPlus]plugin have been load");
+        getServer().getConsoleSender().sendMessage(Color.GREEN + "[StrengthPlus]plugin have been load");
     }
+
     private OnDamageListener damageListener;
     private ConfigFactory factory;
     private CommandHandler handler;
+
     @Override
     public void onEnable() {
-        getServer().getConsoleSender().sendMessage(Color.GREEN+"[StrengthPlus]plugin have been enable");
+        getServer().getConsoleSender().sendMessage(Color.GREEN + "[StrengthPlus]plugin have been enable");
         InfoMenu.outputAuthor(this);
         Bukkit.getPluginCommand(DEFAULT_COMMAND).setExecutor(handler = new CommandHandler(this));
         Bukkit.getPluginCommand(DEFAULT_COMMAND).setTabCompleter(this);
         factory = new ConfigFactory(this);
         damageListener = new OnDamageListener(this);
         reloadConfig();
-        getServer().getPluginManager().registerEvents(damageListener,StrengthPlus.this);
+        getServer().getPluginManager().registerEvents(damageListener, StrengthPlus.this);
     }
 
-    private void readDamage(){
+    private void readDamage() {
         try {
             damageListener.setSwoadDamage(Float.parseFloat(factory.getConfigData("sword")));
             damageListener.setBowDamage(Float.parseFloat(factory.getConfigData("bow")));
@@ -65,9 +68,10 @@ public class StrengthPlus extends JavaPlugin{
     }
 
     private String[] subCommands = {"normal", "safe", "admin", "reload", "paper", "sponge"};//子命令
+
     @Override
     public void onDisable() {
-        getServer().getConsoleSender().sendMessage(Color.GREEN+"[StrengthPlus]plugin have been disable");
+        getServer().getConsoleSender().sendMessage(Color.GREEN + "[StrengthPlus]plugin have been disable");
     }
 
     @Override

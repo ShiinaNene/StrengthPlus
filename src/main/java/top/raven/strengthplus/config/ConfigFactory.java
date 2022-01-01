@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.raven.strengthplus.hander.StregnthStrackHandler;
+
 import java.io.*;
 import java.util.List;
 
@@ -16,16 +17,17 @@ import java.util.List;
  */
 public class ConfigFactory {
     private JavaPlugin plugin;
-    private File configFile,folder;
-    public ConfigFactory(JavaPlugin plugin){
+    private File configFile, folder;
+
+    public ConfigFactory(JavaPlugin plugin) {
         this.plugin = plugin;
         folder = plugin.getDataFolder();
     }
 
-    public void initDefaultConfigFile(){
-        if(!folder.exists()){
-            configFile = new File(folder,"config.yml");
-            if(!configFile.exists()){
+    public void initDefaultConfigFile() {
+        if (!folder.exists()) {
+            configFile = new File(folder, "config.yml");
+            if (!configFile.exists()) {
                 plugin.saveDefaultConfig();
             }
         }
